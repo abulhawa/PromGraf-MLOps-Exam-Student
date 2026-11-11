@@ -1,8 +1,17 @@
-all: 
-	docker-compose up --build -d
+.PHONY: all stop evaluation fire-alert recover
 
-stop: 
-	docker-compose down
+all:
+	docker compose up -d --build bike-api prometheus grafana node-exporter
+
+stop:
+	docker compose down
 
 evaluation:
-	docker-compose up -d --build evaluation
+	docker compose run --rm --build evaluation
+
+# Stop the API to trigger BikeApiDown after the 1-minute pending period.
+fire-alert:
+	docker compose stop bike-api
+
+recover:
+	docker compose up -d bike-api

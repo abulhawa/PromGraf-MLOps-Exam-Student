@@ -1,0 +1,11 @@
+groups:
+  - name: bike-api-alerts
+    rules:
+      - alert: BikeApiDown
+        expr: up{job="bike-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Bike API is unavailable"
+          description: "Prometheus has been unable to scrape bike-api for one minute. Check the API container and its logs."
