@@ -8,7 +8,6 @@ import os
 import sys
 import warnings
 
-warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 
 # --- Configuration ---
 DATASET_URL = "https://archive.ics.uci.edu/static/public/275/bike+sharing+dataset.zip"
@@ -18,7 +17,7 @@ API_PREDICT_URL = "http://bike-api:8080/predict"
 EVALUATION_SAMPLE_SIZE = 1000 # Nombre d'échantillons à utiliser pour chaque évaluation
 
 WEEKLY_PERIODS = {
-    'week1_february': ('2011-01-29 00:00:00', '2011-02-07 23:00:00'),
+    'week1_february': ('2011-02-01 00:00:00', '2011-02-07 23:00:00'),
     'week2_february': ('2011-02-08 00:00:00', '2011-02-14 23:00:00'),
     'week3_february': ('2011-02-15 00:00:00', '2011-02-21 23:00:00')
 }
@@ -39,7 +38,7 @@ def _fetch_data() -> pd.DataFrame:
     """Fetches the bike sharing dataset and returns a DataFrame."""
     print("Fetching data from UCI archive...")
     try:
-        content = requests.get(DATASET_URL, verify=False, timeout=60).content
+        content = requests.get(DATASET_URL, timeout=60).content
         with zipfile.ZipFile(io.BytesIO(content)) as z:
             df = pd.read_csv(z.open("hour.csv"), header=0, sep=',', parse_dates=[DTEDAY_COL_NAME])
         print("Data fetched successfully.")

@@ -1,0 +1,8 @@
+artifacts/
+model/
+__pycache__/
+*.pyc
+.mypy_cache/
+.env
+*.zip
+*.tar.gz

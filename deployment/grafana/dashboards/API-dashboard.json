@@ -253,7 +253,7 @@
             "uid": "eg3vstqffljb4e"
           },
           "editorMode": "code",
-          "expr": "sum by (endpoint) (rate(api_requests_total{status_code=~\"5..\"}[5m])) / sum by (endpoint) (rate(api_requests_total[5m]))",
+          "expr": "(sum by (endpoint) (rate(api_requests_total{status_code=~\"5..\"}[5m])) or 0 * sum by (endpoint) (rate(api_requests_total[5m]))) / sum by (endpoint) (rate(api_requests_total[5m]))",
           "legendFormat": "{{endpoint}}",
           "range": true,
           "refId": "A"

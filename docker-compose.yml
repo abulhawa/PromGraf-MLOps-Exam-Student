@@ -3,12 +3,22 @@ services:
   evaluation:
     build: ./src/evaluation
     depends_on:
-      - bike-api
+      bike-api:
+        condition: service_healthy
 
   bike-api:
     build: ./src/api
+    environment:
+      # Set TRAIN=true on the host to retrain instead of loading saved artifacts.
+      TRAIN: ${TRAIN:-false}
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
     volumes:
       - ./artifacts:/app/artifacts
     restart: always
