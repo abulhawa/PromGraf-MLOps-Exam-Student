@@ -242,7 +242,7 @@ def predict(data: BikeSharingInput, request: Request):
     return PredictionOutput(predicted_count=float(prediction))
 
 
-@app.post("/evaluate")
+@app.post("/evaluate", response_model=EvaluationReportOutput)
 def evaluate(data: EvaluationData, request: Request):
     if not data.data:
         raise HTTPException(status_code=400, detail="Evaluation data is empty")
@@ -293,9 +293,38 @@ def evaluate(data: EvaluationData, request: Request):
         reference_data=reference_dataset,
     )
 
-    logger.info("Evaluation report completed")
+    # Identify metrics by type rather than generated IDs or display names.
+    results = {
+        metric["config"]["type"].rsplit(":", 1)[-1]: metric
+        for metric in snapshot.dict()["metrics"]
+    }
+    rmse = float(results["RMSE"]["value"])
+    mae = float(results["MAE"]["value"]["mean"])
+    r2score = float(results["R2Score"]["value"])
+    drift_result = results["DriftedColumnsCount"]
+    # Flag input drift when the drifted feature share reaches Evidently's threshold.
+    drift_detected = int(
+        drift_result["value"]["share"] >= drift_result["config"]["drift_share"]
+    )
 
-    return snapshot.dict()
+    model_rmse_score.set(rmse)
+    model_mae_score.set(mae)
+    model_r2_score.set(r2score)
+    evidently_data_drift_detected_status.set(drift_detected)
+
+    logger.info(
+        "Evaluation completed for %s: rows=%d, RMSE=%.4f, MAE=%.4f, R2=%.4f, drift=%d",
+        data.evaluation_period_name, len(current_data), rmse, mae, r2score, drift_detected,
+    )
+    return EvaluationReportOutput(
+        message=f"Evaluation completed for {data.evaluation_period_name}",
+        rmse=rmse,
+        mae=mae,
+        r2score=r2score,
+        mape=None,  # MAPE is not calculated; input drift is our additional metric.
+        drift_detected=drift_detected,
+        evaluated_items=len(current_data),
+    )
 
 
 @app.get("/metrics")
