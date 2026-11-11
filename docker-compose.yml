@@ -1,5 +1,61 @@
+name: monitoring-exam
 services:
   evaluation:
     build: ./src/evaluation
     depends_on:
       - bike-api
+
+  bike-api:
+    build: ./src/api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./artifacts:/app/artifacts
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:v3.13.5
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deployment/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./deployment/prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    restart: always
+
+  grafana:
+    image: grafana/grafana:13.2.4
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deployment/grafana/alerting:/etc/grafana/provisioning/alerting:ro
+      - ./deployment/grafana/provisioning/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./deployment/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./deployment/grafana/dashboards:/var/lib/grafana/course-dashboards:ro
+    environment:
+      GRAFANA_PROMETHEUS_UID: ${GRAFANA_PROMETHEUS_UID:-eg3vstqffljb4e}
+    depends_on:
+      - prometheus
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+      - '--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/run/docker/netns/.+)$$'
+    restart: always
+
+volumes:
+  prometheus_data:
+  grafana_data:
