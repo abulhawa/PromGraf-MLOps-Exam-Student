@@ -25,24 +25,30 @@ services:
 
   grafana:
     image: grafana/grafana:13.2.4
-    container_name: grafana
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./deployment/grafana/alerting:/etc/grafana/provisioning/alerting:ro
       - ./deployment/grafana/provisioning/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
       - ./deployment/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./deployment/grafana/dashboards:/var/lib/grafana/course-dashboards:ro
+      - ./deployment/grafana/dashboards:/var/lib/grafana/exam-dashboards:ro
     environment:
+      # Custom variable used by datasource provisioning as the stable Prometheus UID.
+      # Override in the host environment or .env; otherwise use the default below.
       GRAFANA_PROMETHEUS_UID: ${GRAFANA_PROMETHEUS_UID:-eg3vstqffljb4e}
+      # Grafana setting: allow access without signing in (port bound to localhost).
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      # Allow dashboard and alert management without signing in for this local exam.
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      # Hide the login form; anonymous access is enabled separately above.
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
     depends_on:
       - prometheus
     restart: always
 
   node-exporter:
     image: prom/node-exporter:latest
-    container_name: node-exporter
     ports:
       - "9100:9100"
     volumes:
