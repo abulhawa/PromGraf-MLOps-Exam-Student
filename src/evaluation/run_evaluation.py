@@ -154,3 +154,4 @@ if __name__ == "__main__":
 
     start_date, end_date = DEFAULT_EVAL_PERIOD
     run_evaluation(_full_data_cache, DEFAULT_PERIOD_NAME, start_date, end_date)
+    generate_traffic(count=100, full_data=_full_data_cache)
