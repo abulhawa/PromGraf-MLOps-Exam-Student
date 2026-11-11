@@ -1,0 +1,285 @@
+{
+  "refresh": "10s",
+  "title": "Model Performance & Drift",
+  "version": 0,
+  "uid": "bike-model-performance",
+  "panels": [
+    {
+      "targets": [
+        {
+          "editorMode": "code",
+          "datasource": {
+            "type": "prometheus",
+            "uid": null
+          },
+          "range": false,
+          "expr": "model_rmse_score",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": null
+      },
+      "id": 1,
+      "title": "RMSE",
+      "gridPos": {
+        "x": 0,
+        "w": 12,
+        "y": 0.0,
+        "h": 8
+      },
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          },
+          "decimals": 4,
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "none"
+        }
+      },
+      "type": "stat",
+      "options": {
+        "colorMode": "value",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "graphMode": "none",
+        "orientation": "auto"
+      }
+    },
+    {
+      "targets": [
+        {
+          "editorMode": "code",
+          "datasource": {
+            "type": "prometheus",
+            "uid": null
+          },
+          "range": false,
+          "expr": "model_mae_score",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": null
+      },
+      "id": 2,
+      "title": "MAE",
+      "gridPos": {
+        "x": 12,
+        "w": 12,
+        "y": 0.0,
+        "h": 8
+      },
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          },
+          "decimals": 4,
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "none"
+        }
+      },
+      "type": "stat",
+      "options": {
+        "colorMode": "value",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "graphMode": "none",
+        "orientation": "auto"
+      }
+    },
+    {
+      "targets": [
+        {
+          "editorMode": "code",
+          "datasource": {
+            "type": "prometheus",
+            "uid": null
+          },
+          "range": false,
+          "expr": "model_r2_score",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": null
+      },
+      "id": 3,
+      "title": "R² Score",
+      "gridPos": {
+        "x": 0,
+        "w": 12,
+        "y": 8.0,
+        "h": 8
+      },
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          },
+          "decimals": 4,
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "none"
+        }
+      },
+      "type": "stat",
+      "options": {
+        "colorMode": "value",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "graphMode": "none",
+        "orientation": "auto"
+      }
+    },
+    {
+      "targets": [
+        {
+          "editorMode": "code",
+          "datasource": {
+            "type": "prometheus",
+            "uid": null
+          },
+          "range": false,
+          "expr": "evidently_data_drift_detected_status",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": null
+      },
+      "id": 4,
+      "title": "Data Drift Detected",
+      "gridPos": {
+        "x": 12,
+        "w": 12,
+        "y": 8.0,
+        "h": 8
+      },
+      "fieldConfig": {
+        "overrides": [],
+        "defaults": {
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 0,
+                  "color": "green",
+                  "text": "No drift"
+                },
+                "1": {
+                  "index": 1,
+                  "color": "red",
+                  "text": "Drift detected"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "unit": "none",
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      },
+      "type": "stat",
+      "options": {
+        "colorMode": "value",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "graphMode": "none",
+        "orientation": "auto"
+      }
+    }
+  ],
+  "schemaVersion": 41,
+  "timezone": "browser",
+  "id": null,
+  "tags": [
+    "bike-sharing",
+    "model",
+    "drift"
+  ],
+  "time": {
+    "to": "now",
+    "from": "now-1h"
+  },
+  "editable": true
+}
