@@ -242,6 +242,62 @@ def predict(data: BikeSharingInput, request: Request):
     return PredictionOutput(predicted_count=float(prediction))
 
 
+@app.post("/evaluate")
+def evaluate(data: EvaluationData, request: Request):
+    if not data.data:
+        raise HTTPException(status_code=400, detail="Evaluation data is empty")
+
+    current_data = pd.DataFrame(data.data)
+    required_columns = ALL_MODEL_FEATS + [TARGET]
+    missing = set(required_columns) - set(current_data.columns)
+
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Missing columns: {sorted(missing)}",
+        )
+
+    current_data[PREDICTION] = request.app.state.model.predict(
+        current_data[ALL_MODEL_FEATS]
+    )
+
+    definition = DataDefinition(
+        numerical_columns=NUM_FEATS,
+        categorical_columns=CAT_FEATS,
+        regression=[Regression(target=TARGET, prediction=PREDICTION)],
+    )
+
+    report_columns = ALL_MODEL_FEATS + [TARGET, PREDICTION]
+
+    reference_dataset = Dataset.from_pandas(
+        request.app.state.reference_data[report_columns],
+        data_definition=definition,
+    )
+
+    current_dataset = Dataset.from_pandas(
+        current_data[report_columns],
+        data_definition=definition,
+    )
+
+    report = Report(
+        [
+            RMSE(),
+            MAE(),
+            R2Score(),
+            DataDriftPreset(columns=ALL_MODEL_FEATS),
+        ]
+    )
+
+    snapshot = report.run(
+        current_data=current_dataset,
+        reference_data=reference_dataset,
+    )
+
+    logger.info("Evaluation report completed")
+
+    return snapshot.dict()
+
+
 @app.get("/metrics")
 def metrics():
     return Response(
